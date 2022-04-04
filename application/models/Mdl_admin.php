@@ -171,4 +171,136 @@ class Mdl_admin extends CI_Model {
         $eksekusi = $this->db->query("SELECT tbl_mapel.*, count(tbl_materi.id_materi) as jumlah_materi from tbl_mapel left join tbl_materi on tbl_mapel.id_mapel=tbl_materi.id_mapel GROUP BY(tbl_mapel.id_mapel)");
         return $eksekusi;
     }
+
+    public function get_data_mat_pel_search($id_mapel)
+    {
+        return $this->db->get_where('tbl_mapel',array('id_mapel'=>$id_mapel));
+    }
+
+    public function get_data_mat_pel_terpilih($id_mapel)
+	{
+		return $this->db->query("SELECT tbl_kelas.*, tbl_mapel_kelas_guru_group.id_group, tbl_mapel_kelas_guru_group.id_mapel,tbl_mapel_kelas_guru_group.id_kelas as id_kelas_pilih  from tbl_kelas left outer join tbl_mapel_kelas_guru_group on tbl_kelas.id_kelas= tbl_mapel_kelas_guru_group.id_kelas where tbl_mapel_kelas_guru_group.id_mapel='$id_mapel'");
+	}
+
+    public function Add_mat_pel()
+    {
+        $this->db->trans_start();
+        $nama_mapel =preg_replace("/[^a-zA-Z0-9]/", " ", $this->input->post('nama_mapel',TRUE));
+		$deskripsi 	=preg_replace("/[^a-zA-Z0-9]/", " ", $this->input->post('deskripsi',TRUE));
+		$id_kelas 	=$this->input->post('id_kelas', TRUE);
+        $data=array(
+            'nama_mapel'    => $nama_mapel,
+            'deskripsi'     => $deskripsi
+        );
+        $this->db->insert('tbl_mapel', $data);
+        $id_mapel   = $this->db->insert_id();
+        $result=array();
+        foreach ($id_kelas as $key => $value) {
+            $result[]=array(
+                'id_mapel'  => $id_mapel,
+                'id_kelas'  => $_POST['id_kelas'][$key]
+            );
+        }
+        $this->db->insert_batch('tbl_mapel_kelas_guru_group', $result);
+        $this->db->trans_complete();
+    }
+
+    public function Update_mat_pel($id_mapel)
+	{
+		//$id_mapel 	=$this->input->post('id_mapel',TRUE);
+		$this->db->trans_start();
+		$nama_mapel =preg_replace("/[^a-zA-Z0-9]/", " ", $this->input->post('nama_mapel',TRUE));
+		$deskripsi 	=preg_replace("/[^a-zA-Z0-9]/", " ", $this->input->post('deskripsi',TRUE));
+		$id_kelasnya 	=$this->input->post('id_kelasnya', TRUE);
+		//$id_kelas 	=$this->input->post('id_kelas', TRUE);
+		$data=array(
+			'nama_mapel' 		=>$nama_mapel,
+			'deskripsi' 		=>$deskripsi
+		);
+		$this->db->set($data);
+		$this->db->where('id_mapel',$id_mapel);
+		$this->db->update('tbl_mapel');
+		
+		$this->db->delete('tbl_mapel_kelas_guru_group',array('id_mapel'=>$id_mapel));
+		
+		$this->db->trans_complete();
+	}
+
+	public function Update_mat_pel1()
+	{
+		$this->db->trans_start();
+		$id_kelas =$this->input->post('id_kelas', TRUE);
+		$id_mapel =$this->input->post('id_mapel',TRUE);
+		$result=array();
+		foreach ($id_kelas as $key => $value) {
+			$result[]=array(
+				'id_mapel'	=>$id_mapel,
+				'id_kelas' 	=>$_POST['id_kelas'][$key]);
+		}
+		$this->db->insert_batch('tbl_mapel_kelas_guru_group',$result);
+		$this->db->trans_complete();
+	}
+
+    public function get_nama_mapel($kunci)
+    {
+        $eksekusi   = $this->db->query("select * from tbl_mapel where id_mapel='$kunci'");
+        return $eksekusi;
+    }
+
+    public function Save_materi($id_mapel)
+	{
+		$judul_materi 	= preg_replace("/[^a-zA-Z0-9]/", " ", $this->input->post('judul_materi',TRUE));
+		$detail_materi 	= $this->input->post('detail_materi',TRUE);
+		//$id_mapel		=$this->input->post('id_mapel', TRUE);
+		$data=array(
+			'judul_materi'		=>$judul_materi,
+			'detail_materi' 	=>$detail_materi,
+			'id_mapel'			=>$id_mapel
+		);
+		return $this->db->insert('tbl_materi',$data);
+	}
+
+    public function get_data_materi()
+	{
+		$eksekusi 	=$this->db->query("SELECT tbl_materi.id_materi, tbl_materi.judul_materi, left(tbl_materi.detail_materi,1000) as detail_materi, tbl_materi.video,
+tbl_mapel.id_mapel, tbl_mapel.nama_mapel, tbl_mapel.deskripsi
+from tbl_materi left outer join tbl_mapel on tbl_materi.id_mapel=tbl_mapel.id_mapel");
+		return $eksekusi;
+
+	}
+
+	public function Update_materi($kunci)
+	{
+		$judul_materi 	=$this->input->post('judul_materi',TRUE);
+		$detail_materi 	=preg_replace("[a-zA-Z0-9]", " ", $this->input->post('detail_materi',TRUE));
+
+		//$detail_materi 	=$this->input->post('detail_materi',TRUE);
+		//$id_mapel		=$this->input->post('id_mapel',TRUE);
+		$data=array(
+			'judul_materi'		=>$judul_materi,
+			'detail_materi'		=>$detail_materi
+		);
+		$this->db->set($data);
+		$this->db->where('id_materi',$kunci);
+		$this->db->update('tbl_materi');
+		
+	}
+
+	public function Delete_materi($kunci)
+	{
+		$this->db->where('id_materi',$kunci);
+		$this->db->delete('tbl_materi');
+	
+	}
+    
+	public function Delete_list_materi($id_materi)
+	{
+		$this->db->where('id_materi',$id_materi);
+		$this->db->delete('tbl_materi');
+	}
+
+    public function get_materi_mapel($id_mapel)
+	{
+		return $this->db->get_where('tbl_materi',array('id_mapel'=>$id_mapel));
+	}
 }

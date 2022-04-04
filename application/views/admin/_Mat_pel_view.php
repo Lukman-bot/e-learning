@@ -103,3 +103,76 @@
     </div>
 </div>
 <!-- End Modal Tambah Pelajaran -->
+
+<!-- Modal Edit Pelajaran -->
+<form action="<?php echo site_url('packege/update') ?>" method="POST">
+    <div class="modal fade" id="UpdateModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ecampleModalLabel">Update Package</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Package</label>
+                        <div class="col-sm-10"> 
+                            <input type="text" name="package_edit" class="form-control" placeholder="Package Name" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Product</label>
+                        <div class="col-sm-10">
+                            <select name="product_edit[]" class="bootstrap-select strings" data-width="100%" data-live-search="true" multiple required>
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="edit_id" required>
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success btn-sm">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- End Modal Edit Pelajaran -->
+
+<!-- Modal Hapus Pelajaran -->
+<?php
+    foreach ($data_mat_pel->result_array() as $showmatpel) :
+?>
+<div class="modal fade" id="modal-hapus-<?php echo $showmatpel['id_mapel'] ?>">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Hapus Data Materi Pelajaran</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?php echo base_url() ?>index.php/admin/Mat_pel/Hapus" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="id_mapel" value="<?php echo $showmatpel['id_mapel'] ?>">
+                    <p>
+                        Apakah anda yakin akan menghapus data pelajaran <b><?php echo $showmatpel['nama_mapel'] ?></b> tersebut.??
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <li class="fa fa-undo"></li> Batal
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <li class="fa fa-times"></li> Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endforeach; ?>
+<!-- End Modal Hapus Pelajaran -->

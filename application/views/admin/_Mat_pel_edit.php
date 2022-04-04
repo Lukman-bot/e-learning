@@ -1,4 +1,4 @@
-<form action="<?php echo base_url() ?>index.php/admin/Mat_Pel/Perbaharui" method="POST">
+<form action="<?php echo base_url() ?>index.php/admin/Mat_pel/Perbaharui" method="POST">
     <div class="modal-body">
         <input type="hidden" name="id_mapel" value="<?php echo $this->uri->segment(4) ?>">
         <?php
